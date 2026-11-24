@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -28,11 +30,13 @@ import io.github.suqi8.coui.kmp.basic.SmallTitle
 import io.github.suqi8.coui.kmp.basic.SmallTopAppBar
 import io.github.suqi8.coui.kmp.basic.TopAppBar
 import io.github.suqi8.coui.kmp.basic.couiTopAppBarActionItem
+import io.github.suqi8.coui.kmp.blur.isBlurEnabled
 import io.github.suqi8.coui.kmp.core.ExperimentalCOUIApi
 import io.github.suqi8.coui.kmp.icon.COUIIcons
 import io.github.suqi8.coui.kmp.icon.extended.Back
 import io.github.suqi8.coui.kmp.layout.AlertDialogButton
 import io.github.suqi8.coui.kmp.overlay.OverlayAlertDialog
+import io.github.suqi8.coui.kmp.theme.COUITheme
 import java.util.concurrent.TimeUnit
 
 @Composable
@@ -64,13 +68,19 @@ internal fun BridgeTopAppBar(
     val extraHeight = if (gradientGlassExtraHeight > 0.dp) {
         gradientGlassExtraHeight
     } else {
-        AppBarBlurOverlayDefaults.ExtraHeight
+        16.dp
+    }
+    val isDark = COUITheme.colorScheme.background.luminance() < 0.5f
+    val glassColor = if (isDark && isBlurEnabled()) {
+        Color.Black
+    } else {
+        AppBarBlurOverlayDefaults.containerColor()
     }
     if (onBack != null) {
         SmallTopAppBar(
             title = title,
             subtitle = subtitle,
-            color = AppBarBlurOverlayDefaults.containerColor(),
+            color = glassColor,
             scrollBehavior = scrollBehavior,
             gradientGlass = true,
             gradientGlassExtraHeight = extraHeight,
@@ -85,7 +95,7 @@ internal fun BridgeTopAppBar(
             title = title,
             largeTitle = largeTitle,
             subtitle = subtitle,
-            color = AppBarBlurOverlayDefaults.containerColor(),
+            color = glassColor,
             scrollBehavior = scrollBehavior,
             gradientGlass = true,
             gradientGlassExtraHeight = extraHeight,

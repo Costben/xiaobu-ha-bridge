@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.NavigationEventTransitionState
@@ -86,6 +87,7 @@ import io.github.suqi8.coui.kmp.basic.CardListPosition
 import io.github.suqi8.coui.kmp.basic.FloatingActionButton
 import io.github.suqi8.coui.kmp.basic.FloatingActionButtonDefaults
 import io.github.suqi8.coui.kmp.basic.Icon
+import io.github.suqi8.coui.kmp.basic.LocalPlatformAppBarMaterialEnabled
 import io.github.suqi8.coui.kmp.basic.Scaffold
 import io.github.suqi8.coui.kmp.basic.ScrollBehavior
 import io.github.suqi8.coui.kmp.basic.SnackbarHost
@@ -98,6 +100,7 @@ import io.github.suqi8.coui.kmp.basic.TopAppBarDefaults
 import io.github.suqi8.coui.kmp.basic.TopAppBarSearchBar
 import io.github.suqi8.coui.kmp.blur.Backdrop
 import io.github.suqi8.coui.kmp.blur.LocalBackdrop
+import io.github.suqi8.coui.kmp.blur.isBlurEnabled
 import io.github.suqi8.coui.kmp.blur.layerBackdrop
 import io.github.suqi8.coui.kmp.blur.rememberLayerBackdrop
 import io.github.suqi8.coui.kmp.icon.COUIIcons
@@ -406,8 +409,12 @@ fun BridgeAppScreen(
     var lastSelectedEntity by remember { mutableStateOf<HaEntity?>(null) }
     if (selectedEntity != null) lastSelectedEntity = selectedEntity
 
-    // 统一在根层提供 LocalBackdrop，让顶栏、悬浮工具栏、AlertDialog、BottomSheet 与下拉菜单全部启用原生毛玻璃模糊
-    CompositionLocalProvider(LocalBackdrop provides backdrop) {
+    // 统一在根层提供 LocalBackdrop，并禁用基于 AndroidView 的平台顶栏渲染器，
+    // 确保页面圆角裁剪与预测性返回手势下顶栏模糊与渐变遮罩同步跟随、不溢出黑块
+    CompositionLocalProvider(
+        LocalBackdrop provides backdrop,
+        LocalPlatformAppBarMaterialEnabled provides false
+    ) {
         Scaffold(
             edgeToEdge = true,
             containerColor = pageColor,
@@ -681,12 +688,20 @@ private fun EntitiesSearchTopAppBar(
             scrollBehavior.state.heightOffsetLimit = 0f
         }
     }
+    val isDark = COUITheme.colorScheme.background.luminance() < 0.5f
+    val glassColor = if (isDark && isBlurEnabled()) {
+        Color.Black
+    } else {
+        AppBarBlurOverlayDefaults.containerColor()
+    }
     AppBarBlurOverlay(
         scrollFraction = {
             AppBarBlurOverlayDefaults.scrollAlpha(-scrollBehavior.state.contentOffset, density)
         },
-        containerColor = AppBarBlurOverlayDefaults.containerColor(),
+        containerColor = glassColor,
         backdrop = backdrop,
+        extraHeight = 16.dp,
+        platformRenderer = false,
         modifier = Modifier.fillMaxWidth()
     ) {
         Box(

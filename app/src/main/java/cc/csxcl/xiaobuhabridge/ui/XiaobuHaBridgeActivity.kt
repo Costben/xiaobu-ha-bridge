@@ -14,6 +14,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import androidx.core.content.ContextCompat
 import cc.csxcl.xiaobuhabridge.StandaloneBridgePrefsBackend
 import cc.csxcl.xiaobuhabridge.XiaobuHaBridge
 import io.github.suqi8.coui.kmp.basic.AppBarBlurOverlayDefaults
+import io.github.suqi8.coui.kmp.basic.LocalPlatformAppBarMaterialEnabled
 import io.github.suqi8.coui.kmp.nav.core.NavController
 import io.github.suqi8.coui.kmp.nav.core.NavCornerClipMode
 import io.github.suqi8.coui.kmp.nav.core.NavDisplay
@@ -68,13 +70,15 @@ class XiaobuHaBridgeActivity : ComponentActivity() {
             val prefsBackend = XiaobuHaBridge.prefsBackend as? StandaloneBridgePrefsBackend
             val prefsTick = prefsBackend?.prefsVersion ?: 0
             COUITheme(colors = colors) {
-                StandaloneBridgeNavRoot(
-                    context = this,
-                    resumeTick = resumeCounter + prefsTick,
-                    onPrefsChanged = { prefsBackend?.notifyWritten() },
-                    onRequestPermission = { requestBridgePermissions(this) },
-                    onFinishActivity = { finish() }
-                )
+                CompositionLocalProvider(LocalPlatformAppBarMaterialEnabled provides false) {
+                    StandaloneBridgeNavRoot(
+                        context = this,
+                        resumeTick = resumeCounter + prefsTick,
+                        onPrefsChanged = { prefsBackend?.notifyWritten() },
+                        onRequestPermission = { requestBridgePermissions(this) },
+                        onFinishActivity = { finish() }
+                    )
+                }
             }
         }
     }
