@@ -72,7 +72,7 @@ dependencies {
     implementation("io.github.suqi8.coui.kmp:coui-icons:$couiVersion")
     implementation("io.github.suqi8.coui.kmp:coui-blur:$couiVersion")
 
-    implementation("org.luckypray:dexkit:2.0.2")
+    implementation("org.luckypray:dexkit:2.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     testImplementation("junit:junit:4.13.2")
