@@ -27,3 +27,8 @@
 ```bash
 ./gradlew :app:testDebugUnitTest :app:assembleDebug
 ```
+
+## License
+
+[MIT License](LICENSE)
+
