@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true">
+
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="Xiaobu Ha bridge：ColorOS 小布助手本地 Home Assistant 语音/文本指令桥接与流体云反馈" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="102" />
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposed_scope" />
+
+        <activity
+            android:name=".ui.XiaobuHaBridgeActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".fluid.BridgeActionReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="${applicationId}.breenoha.ACTION_SHOW_FLUID_CLOUD" />
+                <action android:name="${applicationId}.breenoha.ACTION_UNDO_COMMAND" />
+                <action android:name="${applicationId}.breenoha.ACTION_DISMISS_FLUID_CLOUD" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name=".fluid.BridgeFluidProvider"
+            android:authorities="${applicationId}.breenoha.fluid"
+            android:exported="true" />
+    </application>
+
+</manifest>
